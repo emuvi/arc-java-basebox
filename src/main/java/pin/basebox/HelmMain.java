@@ -4,6 +4,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import pin.jarbox.ColPanel;
 import pin.jarbox.Helm;
@@ -27,7 +28,7 @@ public class HelmMain extends Helm {
   private final JButton deleteButton = Icons.buttonDelete(e -> menuDelete());
   private final JButton cogButton = Icons.buttonCog(e -> menuCog());
   private final ColPanel connectorsEdits =
-      new ColPanel(insertButton, editButton, deleteButton);
+      new ColPanel(insertButton, editButton, deleteButton, cogButton);
   private final Panel connectorsPanel =
       new RowPanel().addMax(connectorsScroll).add(connectorsEdits);
 
@@ -90,6 +91,6 @@ public class HelmMain extends Helm {
   }
 
   private void menuCog() {
-    
+    JOptionPane.showMessageDialog(null, "Test");
   }
 }
