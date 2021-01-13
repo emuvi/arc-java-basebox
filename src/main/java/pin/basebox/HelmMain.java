@@ -18,19 +18,18 @@ public class HelmMain extends Helm {
   private final JButton newButton = Icons.buttonNew(e -> menuNew());
   private final JButton openButton = Icons.buttonOpen(e -> menuOpen());
   private final JButton saveButton = Icons.buttonSave(e -> menuSave());
-  private final RowPanel toolsPanel =
-    new RowPanel(newButton, openButton, saveButton);
-  private final DefaultListModel<Connector> connectorsModel =
-    new DefaultListModel<>();
+  private final RowPanel toolsPanel = new RowPanel(newButton, openButton, saveButton);
+  private final DefaultListModel<Connector> connectorsModel = new DefaultListModel<>();
   private final JList<Connector> connectorsList = new JList<>(connectorsModel);
   private final JScrollPane connectorsScroll = new JScrollPane(connectorsList);
   private final JButton insertButton = Icons.buttonInsert(e -> menuInsert());
   private final JButton editButton = Icons.buttonEdit(e -> menuEdit());
   private final JButton deleteButton = Icons.buttonDelete(e -> menuDelete());
+  private final JButton cogButton = Icons.buttonCog(e -> menuCog());
   private final ColPanel connectorsEdits =
-    new ColPanel(insertButton, editButton, deleteButton);
+      new ColPanel(insertButton, editButton, deleteButton);
   private final Panel connectorsPanel =
-    new RowPanel().addMax(connectorsScroll).add(connectorsEdits);
+      new RowPanel().addMax(connectorsScroll).add(connectorsEdits);
 
   public HelmMain() {
     super(new JFrame("BaseBox"), new ColPanel());
@@ -46,15 +45,16 @@ public class HelmMain extends Helm {
     }
   }
 
-  private void menuOpen() {}
+  private void menuOpen() {
+  }
 
-  private void menuSave() {}
+  private void menuSave() {
+  }
 
   private void menuInsert() {
     try {
-      new HelmEdit<>(Connector.class, null, true,
-          connector -> makeInsert(connector))
-        .show();
+      new HelmEdit<>(Connector.class, null, true, connector -> makeInsert(connector))
+          .show();
     } catch (Exception e) {
       Utils.treat(e);
     }
@@ -69,9 +69,8 @@ public class HelmMain extends Helm {
     try {
       Connector selected = connectorsList.getSelectedValue();
       if (selected != null) {
-        new HelmEdit<>(Connector.class, selected, false,
-            connector -> makeEdit(connector))
-          .show();
+        new HelmEdit<>(Connector.class, selected, false, connector -> makeEdit(connector))
+            .show();
       }
     } catch (Exception e) {
       Utils.treat(e);
@@ -88,5 +87,9 @@ public class HelmMain extends Helm {
     if (selected > -1) {
       connectorsModel.remove(selected);
     }
+  }
+
+  private void menuCog() {
+    
   }
 }

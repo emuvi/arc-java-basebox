@@ -19,17 +19,29 @@ public class InfoColumn {
     this.nullable = nullable;
   }
 
-  public String getName() { return this.name; }
+  public String getName() {
+    return this.name;
+  }
 
-  public String getClazz() { return this.clazz; }
+  public String getClazz() {
+    return this.clazz;
+  }
 
-  public Integer getSize() { return this.size; }
+  public Integer getSize() {
+    return this.size;
+  }
 
-  public Integer getPrecision() { return this.precision; }
+  public Integer getPrecision() {
+    return this.precision;
+  }
 
-  public Boolean isNullable() { return this.nullable; }
+  public Boolean isNullable() {
+    return this.nullable;
+  }
 
-  public Boolean getNullable() { return this.nullable; }
+  public Boolean getNullable() {
+    return this.nullable;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -38,12 +50,12 @@ public class InfoColumn {
     if (!(o instanceof InfoColumn)) {
       return false;
     }
-    InfoColumn infoColumn = (InfoColumn)o;
-    return Objects.equals(name, infoColumn.name) &&
-      Objects.equals(clazz, infoColumn.clazz) &&
-      Objects.equals(size, infoColumn.size) &&
-      Objects.equals(precision, infoColumn.precision) &&
-      Objects.equals(nullable, infoColumn.nullable);
+    InfoColumn infoColumn = (InfoColumn) o;
+    return Objects.equals(name, infoColumn.name)
+        && Objects.equals(clazz, infoColumn.clazz)
+        && Objects.equals(size, infoColumn.size)
+        && Objects.equals(precision, infoColumn.precision)
+        && Objects.equals(nullable, infoColumn.nullable);
   }
 
   @Override
@@ -53,12 +65,8 @@ public class InfoColumn {
 
   @Override
   public String toString() {
-    return "{"
-      + " name='" + getName() + "'"
-      + ", clazz='" + getClazz() + "'"
-      + ", size='" + getSize() + "'"
-      + ", precision='" + getPrecision() + "'"
-      + ", nullable='" + isNullable() + "'"
-      + "}";
+    return "{" + " name='" + getName() + "'" + ", clazz='" + getClazz() + "'" + ", size='"
+        + getSize() + "'" + ", precision='" + getPrecision() + "'" + ", nullable='"
+        + isNullable() + "'" + "}";
   }
 }
