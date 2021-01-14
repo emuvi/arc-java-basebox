@@ -11,6 +11,7 @@ import pin.jarbox.Helm;
 import pin.jarbox.HelmEdit;
 import pin.jarbox.Icons;
 import pin.jarbox.Panel;
+import pin.jarbox.PopMenu;
 import pin.jarbox.RowPanel;
 import pin.jarbox.Utils;
 
@@ -27,6 +28,7 @@ public class HelmMain extends Helm {
   private final JButton editButton = Icons.buttonEdit(e -> menuEdit());
   private final JButton deleteButton = Icons.buttonDelete(e -> menuDelete());
   private final JButton cogButton = Icons.buttonCog(e -> menuCog());
+  private final PopMenu cogMenu = new PopMenu();
   private final ColPanel connectorsEdits =
       new ColPanel(insertButton, editButton, deleteButton, cogButton);
   private final Panel connectorsPanel =
@@ -37,7 +39,12 @@ public class HelmMain extends Helm {
     setExitOnClose();
     setIcon(Icons.get(HelmMain.class, "basebox.png"));
     container.add(toolsPanel).addMax(connectorsPanel);
+    initCogMenu();
     pack();
+  }
+
+  private void initCogMenu() {
+    cogMenu.put("Test");
   }
 
   private void menuNew() {
@@ -91,6 +98,6 @@ public class HelmMain extends Helm {
   }
 
   private void menuCog() {
-    JOptionPane.showMessageDialog(null, "Test");
+    cogMenu.show(cogButton);
   }
 }
