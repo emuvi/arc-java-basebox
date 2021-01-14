@@ -4,7 +4,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import pin.jarbox.ColPanel;
 import pin.jarbox.Helm;
@@ -44,7 +43,7 @@ public class HelmMain extends Helm {
   }
 
   private void initCogMenu() {
-    cogMenu.put("Test");
+    cogMenu.put("Export to CSV", e -> exportToCSV());
   }
 
   private void menuNew() {
@@ -99,5 +98,13 @@ public class HelmMain extends Helm {
 
   private void menuCog() {
     cogMenu.show(cogButton);
+  }
+
+  private void exportToCSV() {
+    System.out.println("export");
+  }
+
+  private void importFromCSV() {
+    System.out.println("import");
   }
 }

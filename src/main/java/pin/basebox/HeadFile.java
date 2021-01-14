@@ -15,20 +15,20 @@ public class HeadFile implements Serializable {
 
   public static HeadFile bring(File fromFile) throws Exception {
     try (ObjectInputStream ois =
-        new ObjectInputStream(new FileInputStream(fromFile))) {
+         new ObjectInputStream(new FileInputStream(fromFile))) {
       Object read = ois.readObject();
-      if (read instanceof HeadFile head) {
-        return head;
+      if (read instanceof HeadFile) {
+        return (HeadFile) read;
       } else {
         throw new Exception("The file does not contains the right type.");
       }
-        }
+    }
   }
 
   public static void carry(HeadFile head, File toFile) throws Exception {
     try (ObjectOutputStream oos =
-        new ObjectOutputStream(new FileOutputStream(toFile))) {
+         new ObjectOutputStream(new FileOutputStream(toFile))) {
       oos.writeObject(head);
-        }
+    }
   }
 }

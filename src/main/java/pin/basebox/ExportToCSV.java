@@ -8,18 +8,18 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import pin.jarbox.Messenger;
+import pin.jarbox.Progress;
 import pin.jarbox.Utils;
 
 public class ExportToCSV extends Thread {
 
-  private final Messenger messenger;
+  private final Progress progress;
   private final Connector origin;
   private final File destiny;
 
-  public ExportToCSV(Messenger messenger, Connector origin, File destiny) {
+  public ExportToCSV(Progress progress, Connector origin, File destiny) {
     super("ExportToCSV");
-    this.messenger = messenger;
+    this.progress = progress;
     this.origin = origin;
     this.destiny = destiny;
   }
@@ -27,8 +27,8 @@ public class ExportToCSV extends Thread {
   @Override
   public void run() {
     try {
-      messenger.handle("Origin: " + origin);
-      messenger.handle("Establishing destiny: " + destiny);
+      progress.log("Origin: " + origin);
+      progress.log("Establishing destiny: " + destiny);
       if (!destiny.exists()) {
         Files.createDirectories(destiny.toPath());
       }
@@ -38,26 +38,29 @@ public class ExportToCSV extends Thread {
       if (!destiny.isDirectory()) {
         throw new Exception("The destination must be a directory.");
       }
-      messenger.handle("Connecting to Origin...");
+      progress.waitIfPausedAndThrowIfStopped();
+      progress.log("Connecting to Origin...");
       try (Connection conOrigin = origin.connect()) {
-        messenger.handle("Connected.");
-        messenger.handle("Getting tables...");
+        progress.log("Connected.");
+        progress.waitIfPausedAndThrowIfStopped();
+        progress.log("Getting tables...");
         List<InfoTable> tables = new ArrayList<>();
-        ResultSet rst = conOrigin.getMetaData().getTables(
-            null, null, "%", new String[] {"TABLE"});
+        ResultSet rst =
+            conOrigin.getMetaData().getTables(null, null, "%", new String[] {"TABLE"});
         while (rst.next()) {
-          tables.add(new InfoTable(rst.getString("TABLE_CAT"),
-                rst.getString("TABLE_SCHEM"),
-                rst.getString("TABLE_NAME")));
+          var inf = new InfoTable(rst.getString("TABLE_CAT"),
+              rst.getString("TABLE_SCHEM"), rst.getString("TABLE_NAME"));
+          tables.add(inf);
+          progress.log("Got head of: " + inf.getSchemaAndName());
+          progress.waitIfPausedAndThrowIfStopped();
         }
         for (InfoTable infoTable : tables) {
           StringBuilder metadata = new StringBuilder();
-          messenger.handle(infoTable.toString());
+          progress.log(infoTable.toString());
           metadata.append(infoTable.toString());
           metadata.append(System.lineSeparator());
           ResultSet resultColumns = conOrigin.getMetaData().getColumns(
-              infoTable.getCatalog(), infoTable.getSchema(),
-              infoTable.getName(), "%");
+              infoTable.getCatalog(), infoTable.getSchema(), infoTable.getName(), "%");
           StringBuilder select = new StringBuilder("SELECT ");
           boolean primeiro = true;
           while (resultColumns.next()) {
@@ -65,32 +68,31 @@ public class ExportToCSV extends Thread {
               primeiro = false;
             else
               select.append(", ");
-            InfoColumn infoColumn = new InfoColumn(
-                resultColumns.getString("COLUMN_NAME"),
+            InfoColumn infoColumn = new InfoColumn(resultColumns.getString("COLUMN_NAME"),
                 Utils.getClassOfSQL(resultColumns.getInt("DATA_TYPE")),
                 resultColumns.getInt("COLUMN_SIZE"),
                 resultColumns.getInt("DECIMAL_DIGITS"),
                 "YES".equals(resultColumns.getString("IS_NULLABLE")));
-            messenger.handle(infoColumn.toString());
+            progress.log(infoColumn.toString());
             metadata.append(infoColumn.toString());
             metadata.append(System.lineSeparator());
             infoTable.getColumns().add(infoColumn);
             select.append(infoColumn.getName());
           }
-          try (PrintWriter writer = new PrintWriter(
-                new FileOutputStream(
-                  new File(destiny, infoTable.getFileName() + ".tab"),
-                  false),
-                true)) {
+          try (
+              PrintWriter writer = new PrintWriter(
+                  new FileOutputStream(
+                      new File(destiny, infoTable.getFileName() + ".tab"), false),
+                  true)) {
             writer.write(metadata.toString());
-                  }
+          }
           select.append(" FROM ");
           select.append(infoTable.getName());
-          try (PrintWriter writer = new PrintWriter(
-                new FileOutputStream(
-                  new File(destiny, infoTable.getFileName() + ".csv"),
-                  false),
-                true)) {
+          try (
+              PrintWriter writer = new PrintWriter(
+                  new FileOutputStream(
+                      new File(destiny, infoTable.getFileName() + ".csv"), false),
+                  true)) {
             for (int i = 0; i < infoTable.getColumns().size(); i++) {
               if (i > 0) {
                 writer.print(";");
@@ -103,13 +105,12 @@ public class ExportToCSV extends Thread {
                 writer.println("\"");
               }
             }
-            ResultSet rstDe =
-              conOrigin.createStatement().executeQuery(select.toString());
+            ResultSet rstDe = conOrigin.createStatement().executeQuery(select.toString());
             long recordCount = 0;
             while (rstDe.next()) {
               recordCount++;
-              messenger.handle("Writing record " + recordCount + " of " +
-                  infoTable.getName());
+              progress
+                  .log("Writing record " + recordCount + " of " + infoTable.getName());
               for (int i = 0; i < infoTable.getColumns().size(); i++) {
                 if (i > 0) {
                   writer.print(";");
@@ -144,13 +145,11 @@ public class ExportToCSV extends Thread {
                     writer.print(Utils.formatTime(rstDe.getTime(i + 1)));
                     break;
                   case "Timestamp":
-                    writer.print(
-                        Utils.formatTimestamp(rstDe.getTimestamp(i + 1)));
+                    writer.print(Utils.formatTimestamp(rstDe.getTimestamp(i + 1)));
                     break;
                   case "Byte":
                     writer.print("\"");
-                    writer.print(
-                        Utils.clean(Utils.encodeBase64(rstDe.getBytes(i + 1))));
+                    writer.print(Utils.clean(Utils.encodeBase64(rstDe.getBytes(i + 1))));
                     ending = "\"";
                     break;
                   default:
@@ -163,12 +162,12 @@ public class ExportToCSV extends Thread {
                 }
               }
             }
-                  }
+          }
         }
       }
-      messenger.handle("DumpToCSV Finished!");
+      progress.log("DumpToCSV Finished!");
     } catch (Exception error) {
-      messenger.handle(error);
+      progress.log(error);
     }
   }
 }

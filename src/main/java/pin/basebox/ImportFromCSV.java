@@ -1,17 +1,17 @@
 package pin.basebox;
 
 import java.io.File;
-import pin.jarbox.Messenger;
+import pin.jarbox.Progress;
 
 public class ImportFromCSV extends Thread {
 
-  private final Messenger messenger;
+  private final Progress progress;
   private final File origin;
   private final Connector destiny;
 
-  public ImportFromCSV(Messenger messenger, File origin, Connector destiny) {
+  public ImportFromCSV(Progress progress, File origin, Connector destiny) {
     super("ImportFromCSV");
-    this.messenger = messenger;
+    this.progress = progress;
     this.origin = origin;
     this.destiny = destiny;
   }
@@ -21,7 +21,7 @@ public class ImportFromCSV extends Thread {
     try {
       
     } catch (Exception e) {
-      messenger.handle(e);
+      progress.log(e);
     }
   }
 }
