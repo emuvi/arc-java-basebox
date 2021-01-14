@@ -1,3 +1,4 @@
+(message "Raising the program...")
 (let ((build (shell-command-to-string "mvn clean install")))
   (if (string-match-p (regexp-quote "[INFO] BUILD SUCCESS") build)
       (start-process "java-run" "*java*" "java" "--enable-preview" "-jar" "build/BaseBox.jar")
