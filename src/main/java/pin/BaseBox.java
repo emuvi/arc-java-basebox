@@ -7,9 +7,13 @@ import pin.jarbox.Utils;
 public class BaseBox {
 
   public static void main(String[] args) {
-    Console.start(args);
-    Utils.startSystemLook();
-    Utils.startMain(new HelmMain());
+    try {
+      Console.start(args);
+      Utils.startSystemLook();
+      Utils.startMain(new HelmMain());
+    } catch (Exception e) {
+      Utils.treat(e);
+    }
   }
   
 }
