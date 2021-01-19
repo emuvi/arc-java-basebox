@@ -3,7 +3,7 @@ package pin.basebox;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import pin.jarbox.WzdString;
+import pin.jarbox.WzdChars;
 
 public class InfoTable {
 
@@ -31,7 +31,7 @@ public class InfoTable {
   }
 
   public String getSchemaAndName() {
-    return WzdString.sum(schema, ".", name);
+    return WzdChars.sum(schema, ".", name);
   }
 
   public List<InfoColumn> getColumns() { return columns; }

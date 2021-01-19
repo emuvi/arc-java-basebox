@@ -12,7 +12,9 @@ import pin.jarbox.Icons;
 import pin.jarbox.Panel;
 import pin.jarbox.PopMenu;
 import pin.jarbox.RowPanel;
-import pin.jarbox.Utils;
+import pin.jarbox.WzdDesk;
+import pin.jarbox.WzdLog;
+
 
 public class HelmMain extends Helm {
 
@@ -47,7 +49,7 @@ public class HelmMain extends Helm {
   }
 
   private void menuNew() {
-    if (Utils.question("Do you wanna clear the connectors.")) {
+    if (WzdDesk.question("Do you wanna clear the connectors.")) {
       connectorsModel.clear();
     }
   }
@@ -63,7 +65,7 @@ public class HelmMain extends Helm {
       new HelmEdit<>(Connector.class, null, true, connector -> makeInsert(connector))
           .show();
     } catch (Exception e) {
-      Utils.treat(e);
+      WzdLog.treat(e);
     }
   }
 
@@ -80,7 +82,7 @@ public class HelmMain extends Helm {
             .show();
       }
     } catch (Exception e) {
-      Utils.treat(e);
+      WzdLog.treat(e);
     }
   }
 

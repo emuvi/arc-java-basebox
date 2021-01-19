@@ -9,7 +9,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import pin.jarbox.Progress;
-import pin.jarbox.Utils;
+import pin.jarbox.WzdData;
+
 
 public class ExportToCSV extends Thread {
 
@@ -69,7 +70,7 @@ public class ExportToCSV extends Thread {
             else
               select.append(", ");
             InfoColumn infoColumn = new InfoColumn(resultColumns.getString("COLUMN_NAME"),
-                Utils.getClassOfSQL(resultColumns.getInt("DATA_TYPE")),
+                WzdData.getClassOfSQL(resultColumns.getInt("DATA_TYPE")),
                 resultColumns.getInt("COLUMN_SIZE"),
                 resultColumns.getInt("DECIMAL_DIGITS"),
                 "YES".equals(resultColumns.getString("IS_NULLABLE")));
@@ -135,21 +136,21 @@ public class ExportToCSV extends Thread {
                   case "Character":
                   case "String":
                     writer.print("\"");
-                    writer.print(Utils.clean(rstDe.getString(i + 1)));
+                    writer.print(WzdData.clean(rstDe.getString(i + 1)));
                     ending = "\"";
                     break;
                   case "Date":
-                    writer.print(Utils.formatDate(rstDe.getDate(i + 1)));
+                    writer.print(WzdData.formatDate(rstDe.getDate(i + 1)));
                     break;
                   case "Time":
-                    writer.print(Utils.formatTime(rstDe.getTime(i + 1)));
+                    writer.print(WzdData.formatTime(rstDe.getTime(i + 1)));
                     break;
                   case "Timestamp":
-                    writer.print(Utils.formatTimestamp(rstDe.getTimestamp(i + 1)));
+                    writer.print(WzdData.formatTimestamp(rstDe.getTimestamp(i + 1)));
                     break;
                   case "Byte":
                     writer.print("\"");
-                    writer.print(Utils.clean(Utils.encodeBase64(rstDe.getBytes(i + 1))));
+                    writer.print(WzdData.clean(WzdData.encodeBase64(rstDe.getBytes(i + 1))));
                     ending = "\"";
                     break;
                   default:
