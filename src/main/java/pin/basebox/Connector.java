@@ -47,13 +47,13 @@ public class Connector implements Serializable {
   @Override
   public String toString() {
     return "{"
-      + " name='" + name + "'"
-      + ", base='" + base + "'"
-      + ", path='" + path + "'"
-      + ", port='" + port + "'"
-      + ", data='" + data + "'"
-      + ", user='" + user + "'"
-      + ", pass='" + pass + "'"
-      + "}";
+        + " name='" + name + "'"
+        + ", base='" + base + "'"
+        + ", path='" + path + "'"
+        + ", port='" + port + "'"
+        + ", data='" + data + "'"
+        + ", user='" + user + "'"
+        + ", pass='" + pass + "'"
+        + "}";
   }
 }

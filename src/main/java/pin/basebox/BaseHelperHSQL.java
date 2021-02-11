@@ -18,26 +18,26 @@ public class BaseHelperHSQL extends BaseHelper {
     if (onlyIfNotExists) {
       builder.append("IF NOT EXISTS ");
     }
-    builder.append(table.getEsquemaAndNome());
+    builder.append(table.getSchemaAndName());
     builder.append(" (");
-    for (int ic = 0; ic < table.getCampos().size(); ic++) {
+    for (int ic = 0; ic < table.fields.size(); ic++) {
       if (ic > 0) {
         builder.append(", ");
       }
-      TableField campo = table.getCampos().get(ic);
+      TableField campo = table.fields.get(ic);
       builder.append(campo.name);
       switch (campo.nature) {
-        case Logico:
+        case Bool:
           builder.append(" BOOLEAN");
           break;
-        case Caracter:
+        case Char:
           builder.append(" CHAR(1)");
           break;
-        case Caracteres:
-        case Senha:
-        case Cor:
-        case Enumeracao:
-        case Sugestao:
+        case Chars:
+        case Pass:
+        case Color:
+        case Enumeration:
+        case Sugestion:
           builder.append(" VARCHAR");
           if (campo.size != null) {
             builder.append("(");
@@ -45,16 +45,16 @@ public class BaseHelperHSQL extends BaseHelper {
             builder.append(")");
           }
           break;
-        case Inteiro:
+        case Int:
         case Serial:
           builder.append(" INTEGER");
           break;
-        case InteiroLongo:
-        case SerialLongo:
+        case Long:
+        case SerialLong:
           builder.append(" BIGINT");
           break;
-        case Numero:
-        case NumeroLongo:
+        case Float:
+        case Double:
           builder.append(" NUMERIC");
           if (campo.size != null) {
             builder.append("(");
@@ -66,18 +66,18 @@ public class BaseHelperHSQL extends BaseHelper {
             builder.append(")");
           }
           break;
-        case Data:
+        case Date:
           builder.append(" DATE");
           break;
-        case Hora:
+        case Time:
           builder.append(" TIME");
           break;
-        case DataHora:
-        case Momento:
+        case DateHour:
+        case Timestamp:
           builder.append(" TIMESTAMP");
           break;
-        case Arquivo:
-        case Indefinido:
+        case Bytes:
+        case Undefined:
           builder.append(" BLOB");
           if (campo.size != null) {
             builder.append("(");
@@ -92,13 +92,13 @@ public class BaseHelperHSQL extends BaseHelper {
         builder.append(" NOT NULL");
       }
     }
-    if (table.hasChaves() && !table.getChaves().isEmpty()) {
+    if (table.keys != null && !table.keys.isEmpty()) {
       builder.append(", PRIMARY KEY (");
-      for (int ic = 0; ic < table.getChaves().size(); ic++) {
+      for (int ic = 0; ic < table.keys.size(); ic++) {
         if (ic > 0) {
           builder.append(", ");
         }
-        builder.append(table.getChaves().get(ic));
+        builder.append(table.keys.get(ic));
       }
       builder.append(")");
     }

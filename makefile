@@ -2,6 +2,7 @@ all : mvn pkg
 
 mvn :
 	mvn clean install
+	mvn source:jar install
 
 dps :
 	jdeps --module-path build/libBaseBox/ --list-deps build/BaseBox.jar build/libBaseBox/* | grep -E "java\.|javax\.|jdk\."

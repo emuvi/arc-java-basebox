@@ -46,6 +46,7 @@ public class HelmMain extends Helm {
 
   private void initCogMenu() {
     cogMenu.put("Export to CSV", e -> exportToCSV());
+    cogMenu.put("Import from CSV", e -> importFromCSV());
   }
 
   private void menuNew() {
@@ -103,10 +104,10 @@ public class HelmMain extends Helm {
   }
 
   private void exportToCSV() {
-    System.out.println("export");
+    System.out.println("Export");
   }
 
   private void importFromCSV() {
-    System.out.println("import");
+    System.out.println("Import");
   }
 }

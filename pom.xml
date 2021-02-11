@@ -7,7 +7,7 @@
   <version>0.1.0</version>
 
   <name>BaseBox</name>
-  <url>https://github.com/emuvs/basebox</url>
+  <url>https://github.com/emuvi/basebox</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
