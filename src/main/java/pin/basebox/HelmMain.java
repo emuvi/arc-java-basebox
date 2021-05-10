@@ -5,15 +5,15 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import pin.jarbox.ColPanel;
-import pin.jarbox.Helm;
-import pin.jarbox.HelmEdit;
-import pin.jarbox.Icons;
-import pin.jarbox.Panel;
-import pin.jarbox.PopMenu;
-import pin.jarbox.RowPanel;
-import pin.jarbox.WzdDesk;
-import pin.jarbox.WzdLog;
+import pin.jarbox.dsk.ColPanel;
+import pin.jarbox.dsk.Helm;
+import pin.jarbox.dsk.HelmEdit;
+import pin.jarbox.dsk.Icons;
+import pin.jarbox.dsk.Panel;
+import pin.jarbox.dsk.PopMenu;
+import pin.jarbox.dsk.RowPanel;
+import pin.jarbox.wzd.WzdDesk;
+import pin.jarbox.wzd.WzdLog;
 
 
 public class HelmMain extends Helm {
@@ -30,10 +30,10 @@ public class HelmMain extends Helm {
   private final JButton deleteButton = Icons.buttonDelete(e -> menuDelete());
   private final JButton cogButton = Icons.buttonCog(e -> menuCog());
   private final PopMenu cogMenu = new PopMenu();
-  private final ColPanel connectorsEdits =
-      new ColPanel(insertButton, editButton, deleteButton, cogButton);
-  private final Panel connectorsPanel =
-      new RowPanel().addMax(connectorsScroll).add(connectorsEdits);
+  private final ColPanel connectorsEdits = new ColPanel(insertButton, editButton,
+      deleteButton, cogButton);
+  private final Panel connectorsPanel = new RowPanel().addMax(connectorsScroll).add(
+      connectorsEdits);
 
   public HelmMain() {
     super(new JFrame("BaseBox"), new ColPanel());
@@ -55,11 +55,9 @@ public class HelmMain extends Helm {
     }
   }
 
-  private void menuOpen() {
-  }
+  private void menuOpen() {}
 
-  private void menuSave() {
-  }
+  private void menuSave() {}
 
   private void menuInsert() {
     try {

@@ -3,7 +3,7 @@ package pin.basebox;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import pin.jarbox.Pass;
+import pin.jarbox.val.Pass;
 
 public class Connector implements Serializable {
 

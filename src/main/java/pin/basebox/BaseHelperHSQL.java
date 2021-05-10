@@ -1,6 +1,8 @@
 package pin.basebox;
 
 import java.sql.Connection;
+import pin.jarbox.dat.Table;
+import pin.jarbox.dat.TableField;
 
 public class BaseHelperHSQL extends BaseHelper {
 
@@ -72,7 +74,7 @@ public class BaseHelperHSQL extends BaseHelper {
         case Time:
           builder.append(" TIME");
           break;
-        case DateHour:
+        case DateTime:
         case Timestamp:
           builder.append(" TIMESTAMP");
           break;

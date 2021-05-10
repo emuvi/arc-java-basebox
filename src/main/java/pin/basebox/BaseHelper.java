@@ -5,6 +5,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import pin.jarbox.dat.Table;
+import pin.jarbox.dat.TableHead;
+
 
 public abstract class BaseHelper {
 

@@ -1,6 +1,7 @@
 package pin.basebox;
 
 import java.sql.Connection;
+import pin.jarbox.dat.Table;
 
 public class BaseHelperMySQL extends BaseHelper {
 

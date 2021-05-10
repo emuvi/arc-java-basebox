@@ -6,10 +6,12 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
-import pin.jarbox.Progress;
-import pin.jarbox.WzdData;
+import pin.jarbox.bin.Progress;
+import pin.jarbox.dat.Table;
+import pin.jarbox.dat.TableField;
+import pin.jarbox.dat.TableHead;
+import pin.jarbox.wzd.WzdData;
 
 public class ExportToCSV extends Thread {
 

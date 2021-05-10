@@ -1,8 +1,8 @@
 package pin.basebox;
 
 import java.io.File;
-import pin.jarbox.Progress;
-import pin.jarbox.WzdFile;
+import pin.jarbox.bin.Progress;
+import pin.jarbox.wzd.WzdFile;
 
 public class ImportFromCSV extends Thread {
 
