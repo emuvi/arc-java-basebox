@@ -11,7 +11,9 @@ import pin.jarbox.bin.Progress;
 import pin.jarbox.dat.Table;
 import pin.jarbox.dat.TableField;
 import pin.jarbox.dat.TableHead;
-import pin.jarbox.wzd.WzdData;
+import pin.jarbox.wzd.WzdChars;
+import pin.jarbox.wzd.WzdDate;
+import pin.jarbox.wzd.WzdFile;
 
 public class ExportToCSV extends Thread {
 
@@ -65,20 +67,14 @@ public class ExportToCSV extends Thread {
             metadata.append(System.lineSeparator());
             select.append(field.name);
           }
-          try (PrintWriter writer = new PrintWriter(
-                   new FileOutputStream(
-                       new File(destiny, tableHead.getNameForFile() + ".tab"),
-                       false),
-                   true)) {
+          try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(destiny,
+              tableHead.getNameForFile() + ".tab"), false), true)) {
             writer.write(metadata.toString());
           }
           select.append(" FROM ");
           select.append(tableHead.getSchemaAndName());
-          try (PrintWriter writer = new PrintWriter(
-                   new FileOutputStream(
-                       new File(destiny, tableHead.getNameForFile() + ".csv"),
-                       false),
-                   true)) {
+          try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(destiny,
+              tableHead.getNameForFile() + ".csv"), false), true)) {
             for (int i = 0; i < table.fields.size(); i++) {
               if (i > 0) {
                 writer.print(";");
@@ -91,58 +87,55 @@ public class ExportToCSV extends Thread {
                 writer.println("\"");
               }
             }
-            ResultSet rstDe =
-                conOrigin.createStatement().executeQuery(select.toString());
+            ResultSet rstDe = conOrigin.createStatement().executeQuery(select.toString());
             long recordCount = 0;
             while (rstDe.next()) {
               recordCount++;
-              progress.log("Writing record " + recordCount + " of " +
-                           tableHead.name);
+              progress.log("Writing record " + recordCount + " of " + tableHead.name);
               for (int i = 0; i < table.fields.size(); i++) {
                 if (i > 0) {
                   writer.print(";");
                 }
                 String ending = "";
                 switch (table.fields.get(i).nature) {
-                case Bool:
-                  writer.print(rstDe.getBoolean(i + 1));
-                  break;
-                case Int:
-                  writer.print(rstDe.getInt(i + 1));
-                  break;
-                case Long:
-                  writer.print(rstDe.getLong(i + 1));
-                  break;
-                case Float:
-                  writer.print(rstDe.getFloat(i + 1));
-                  break;
-                case Double:
-                  writer.print(rstDe.getDouble(i + 1));
-                  break;
-                case Char:
-                case Chars:
-                  writer.print("\"");
-                  writer.print(WzdData.clean(rstDe.getString(i + 1)));
-                  ending = "\"";
-                  break;
-                case Date:
-                  writer.print(WzdData.formatDate(rstDe.getDate(i + 1)));
-                  break;
-                case Time:
-                  writer.print(WzdData.formatTime(rstDe.getTime(i + 1)));
-                  break;
-                case Timestamp:
-                  writer.print(
-                      WzdData.formatTimestamp(rstDe.getTimestamp(i + 1)));
-                  break;
-                case Bytes:
-                  writer.print("\"");
-                  writer.print(WzdData.clean(
-                      WzdData.encodeBase64(rstDe.getBytes(i + 1))));
-                  ending = "\"";
-                  break;
-                default:
-                  throw new Exception("DataType Not Supported.");
+                  case Bool:
+                    writer.print(rstDe.getBoolean(i + 1));
+                    break;
+                  case Int:
+                    writer.print(rstDe.getInt(i + 1));
+                    break;
+                  case Long:
+                    writer.print(rstDe.getLong(i + 1));
+                    break;
+                  case Float:
+                    writer.print(rstDe.getFloat(i + 1));
+                    break;
+                  case Double:
+                    writer.print(rstDe.getDouble(i + 1));
+                    break;
+                  case Char:
+                  case Chars:
+                    writer.print("\"");
+                    writer.print(WzdChars.replaceControlFlow(rstDe.getString(i + 1)
+                        .replace("\"", "\"\"")));
+                    ending = "\"";
+                    break;
+                  case Date:
+                    writer.print(WzdDate.formatDate(rstDe.getDate(i + 1)));
+                    break;
+                  case Time:
+                    writer.print(WzdDate.formatTime(rstDe.getTime(i + 1)));
+                    break;
+                  case Timestamp:
+                    writer.print(WzdDate.formatTimestamp(rstDe.getTimestamp(i + 1)));
+                    break;
+                  case Bytes:
+                    writer.print("\"");
+                    writer.print(WzdFile.encodeToBase64(rstDe.getBytes(i + 1)));
+                    ending = "\"";
+                    break;
+                  default:
+                    throw new Exception("DataType Not Supported.");
                 }
                 if (i < table.fields.size() - 1) {
                   writer.print(ending);
