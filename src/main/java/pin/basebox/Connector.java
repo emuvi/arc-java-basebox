@@ -35,7 +35,7 @@ public class Connector implements Serializable {
     return result;
   }
 
-  public synchronized Connection connect() throws Exception {
+  public Connection connect() throws Exception {
     Class.forName(base.getClasse());
     if ((user != null && !user.isEmpty() && pass != null)) {
       return DriverManager.getConnection(getFormed(), user, pass.getPassword());
@@ -46,14 +46,8 @@ public class Connector implements Serializable {
 
   @Override
   public String toString() {
-    return "{"
-        + " name='" + name + "'"
-        + ", base='" + base + "'"
-        + ", path='" + path + "'"
-        + ", port='" + port + "'"
-        + ", data='" + data + "'"
-        + ", user='" + user + "'"
-        + ", pass='" + pass + "'"
-        + "}";
+    return "{" + " name='" + name + "'" + ", base='" + base + "'" + ", path='" + path
+        + "'" + ", port='" + port + "'" + ", data='" + data + "'" + ", user='" + user
+        + "'" + ", pass='" + pass + "'" + "}";
   }
 }

@@ -1,18 +1,24 @@
 package pin.basebox;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import com.google.gson.Gson;
 import pin.jarbox.dsk.ColPanel;
 import pin.jarbox.dsk.Helm;
 import pin.jarbox.dsk.HelmEdit;
 import pin.jarbox.dsk.Icons;
 import pin.jarbox.dsk.Panel;
 import pin.jarbox.dsk.PopMenu;
+import pin.jarbox.dsk.ProgressDesk;
 import pin.jarbox.dsk.RowPanel;
 import pin.jarbox.wzd.WzdDesk;
+import pin.jarbox.wzd.WzdFile;
 import pin.jarbox.wzd.WzdLog;
 
 
@@ -35,6 +41,8 @@ public class HelmMain extends Helm {
   private final Panel connectorsPanel = new RowPanel().addMax(connectorsScroll).add(
       connectorsEdits);
 
+  private File connectorsFile = null;
+
   public HelmMain() {
     super(new JFrame("BaseBox"), new ColPanel());
     setExitOnClose();
@@ -55,9 +63,40 @@ public class HelmMain extends Helm {
     }
   }
 
-  private void menuOpen() {}
+  private void menuOpen() {
+    try {
+      var selected = WzdFile.openFile(connectorsFile, "Connectors (*.cns)", "cns");
+      if (selected == null) {
+        return;
+      }
+      connectorsFile = selected;
+      var connectors = new Gson().fromJson(Files.readString(selected.toPath()),
+          Connectors.class);
+      connectorsModel.removeAllElements();
+      for (Connector connector : connectors) {
+        connectorsModel.addElement(connector);
+      }
+    } catch (Exception e) {
+      WzdLog.treat(e);
+    }
+  }
 
-  private void menuSave() {}
+  private void menuSave() {
+    try {
+      var selected = WzdFile.saveFile(connectorsFile, "Connectors (*.cns)", "cns");
+      if (selected == null) {
+        return;
+      }
+      connectorsFile = selected;
+      var connectors = new Connectors();
+      for (int i = 0; i < connectorsModel.getSize(); i++) {
+        connectors.add(connectorsModel.get(i));
+      }
+      Files.writeString(selected.toPath(), new Gson().toJson(connectors));
+    } catch (IOException e) {
+      WzdLog.treat(e);
+    }
+  }
 
   private void menuInsert() {
     try {
@@ -102,7 +141,18 @@ public class HelmMain extends Helm {
   }
 
   private void exportToCSV() {
-    System.out.println("Export");
+    try {
+      var origin = connectorsList.getSelectedValue();
+      if (origin == null) {
+        throw new Exception("You must select a connector.");
+      }
+      var destiny = WzdFile.openDir();
+      if (destiny != null) {
+        new ExportToCSV(origin, destiny, new ProgressDesk("Export to CSV", true)).start();
+      }
+    } catch (Exception e) {
+      WzdLog.treat(e);
+    }
   }
 
   private void importFromCSV() {

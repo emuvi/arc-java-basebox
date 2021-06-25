@@ -1,2 +1,2 @@
 @echo off
-mvn exec:java -Dexec.mainClass="pin.BaseBox"
+call mvn exec:java -Dexec.mainClass="pin.BaseBox"

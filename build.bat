@@ -1,3 +1,4 @@
 @echo off
-mvn clean install
-mvn source:jar install
+call mvn clean install
+call mvn source:jar install
+pause

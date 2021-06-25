@@ -20,7 +20,7 @@ public class BaseHelperHSQL extends BaseHelper {
     if (onlyIfNotExists) {
       builder.append("IF NOT EXISTS ");
     }
-    builder.append(table.getSchemaAndName());
+    builder.append(table.getSchemaName());
     builder.append(" (");
     for (int ic = 0; ic < table.fields.size(); ic++) {
       if (ic > 0) {

@@ -8,24 +8,24 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.List;
 import pin.jarbox.bin.Progress;
+import pin.jarbox.dat.CSVFile;
+import pin.jarbox.dat.FileMode;
 import pin.jarbox.dat.Table;
-import pin.jarbox.dat.TableField;
 import pin.jarbox.dat.TableHead;
-import pin.jarbox.wzd.WzdChars;
 import pin.jarbox.wzd.WzdDate;
 import pin.jarbox.wzd.WzdFile;
 
 public class ExportToCSV extends Thread {
 
-  private final Progress progress;
   private final Connector origin;
   private final File destiny;
+  private final Progress progress;
 
-  public ExportToCSV(Progress progress, Connector origin, File destiny) {
+  public ExportToCSV(Connector origin, File destiny, Progress progress) {
     super("ExportToCSV");
-    this.progress = progress;
     this.origin = origin;
     this.destiny = destiny;
+    this.progress = progress;
   }
 
   @Override
@@ -44,110 +44,63 @@ public class ExportToCSV extends Thread {
       }
       progress.waitIfPausedAndThrowIfStopped();
       progress.log("Connecting to Origin...");
-      try (Connection conOrigin = origin.connect()) {
+      try (Connection originConn = origin.connect()) {
         progress.log("Connected.");
         progress.waitIfPausedAndThrowIfStopped();
         progress.log("Getting tables...");
-        List<TableHead> tables = origin.base.getHelper().getTables(conOrigin);
+        List<TableHead> tables = origin.base.getHelper().getTables(originConn);
         for (TableHead tableHead : tables) {
           progress.log("Processing: " + tableHead.toString());
-          Table table = tableHead.getTable(conOrigin);
-          StringBuilder metadata = new StringBuilder();
-          metadata.append(tableHead.toString());
-          metadata.append(System.lineSeparator());
-          StringBuilder select = new StringBuilder("SELECT ");
-          boolean first = true;
-          for (TableField field : table.fields) {
-            if (first)
-              first = false;
-            else
-              select.append(", ");
-            progress.log(field.toString());
-            metadata.append(field.toString());
-            metadata.append(System.lineSeparator());
-            select.append(field.name);
-          }
+          Table table = tableHead.getTable(originConn);
           try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(destiny,
               tableHead.getNameForFile() + ".tab"), false), true)) {
-            writer.write(metadata.toString());
+            writer.write(table.toString());
           }
-          select.append(" FROM ");
-          select.append(tableHead.getSchemaAndName());
-          try (PrintWriter writer = new PrintWriter(new FileOutputStream(new File(destiny,
-              tableHead.getNameForFile() + ".csv"), false), true)) {
+          final var tableDestiny = new File(destiny, tableHead.getNameForFile() + ".csv");
+          try (CSVFile csvFile = new CSVFile(tableDestiny, FileMode.WRITE)) {
+            final var row = new String[table.fields.size()];
             for (int i = 0; i < table.fields.size(); i++) {
-              if (i > 0) {
-                writer.print(";");
-              }
-              writer.print("\"");
-              writer.print(table.fields.get(i).name);
-              if (i < table.fields.size() - 1) {
-                writer.print("\"");
-              } else {
-                writer.println("\"");
-              }
+              row[i] = table.fields.get(i).name;
             }
-            ResultSet rstDe = conOrigin.createStatement().executeQuery(select.toString());
+            csvFile.writeLine(row);
+            ResultSet rstOrigin = origin.base.getHelper().selectFields(table, originConn);
             long recordCount = 0;
-            while (rstDe.next()) {
+            while (rstOrigin.next()) {
               recordCount++;
               progress.log("Writing record " + recordCount + " of " + tableHead.name);
               for (int i = 0; i < table.fields.size(); i++) {
-                if (i > 0) {
-                  writer.print(";");
-                }
-                String ending = "";
                 switch (table.fields.get(i).nature) {
                   case Bool:
-                    writer.print(rstDe.getBoolean(i + 1));
-                    break;
                   case Int:
-                    writer.print(rstDe.getInt(i + 1));
-                    break;
                   case Long:
-                    writer.print(rstDe.getLong(i + 1));
-                    break;
                   case Float:
-                    writer.print(rstDe.getFloat(i + 1));
-                    break;
                   case Double:
-                    writer.print(rstDe.getDouble(i + 1));
-                    break;
                   case Char:
                   case Chars:
-                    writer.print("\"");
-                    writer.print(WzdChars.replaceControlFlow(rstDe.getString(i + 1)
-                        .replace("\"", "\"\"")));
-                    ending = "\"";
+                    row[i] = rstOrigin.getString(i + 1);
                     break;
                   case Date:
-                    writer.print(WzdDate.formatDate(rstDe.getDate(i + 1)));
+                    row[i] = WzdDate.formatDate(rstOrigin.getDate(i + 1));
                     break;
                   case Time:
-                    writer.print(WzdDate.formatTime(rstDe.getTime(i + 1)));
+                    row[i] = WzdDate.formatTime(rstOrigin.getTime(i + 1));
                     break;
                   case Timestamp:
-                    writer.print(WzdDate.formatTimestamp(rstDe.getTimestamp(i + 1)));
+                    row[i] = WzdDate.formatTimestamp(rstOrigin.getTimestamp(i + 1));
                     break;
                   case Bytes:
-                    writer.print("\"");
-                    writer.print(WzdFile.encodeToBase64(rstDe.getBytes(i + 1)));
-                    ending = "\"";
+                    row[i] = WzdFile.encodeToBase64(rstOrigin.getBytes(i + 1));
                     break;
                   default:
                     throw new Exception("DataType Not Supported.");
                 }
-                if (i < table.fields.size() - 1) {
-                  writer.print(ending);
-                } else {
-                  writer.println(ending);
-                }
               }
+              csvFile.writeLine(row);
             }
           }
         }
       }
-      progress.log("DumpToCSV Finished!");
+      progress.log("ExportToCSV Finished!");
     } catch (Exception error) {
       progress.log(error);
     }
