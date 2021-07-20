@@ -12,8 +12,8 @@ import pin.jarbox.dat.CSVFile;
 import pin.jarbox.dat.FileMode;
 import pin.jarbox.dat.Table;
 import pin.jarbox.dat.TableHead;
+import pin.jarbox.wzd.WzdBytes;
 import pin.jarbox.wzd.WzdDate;
-import pin.jarbox.wzd.WzdFile;
 
 public class ExportToCSV extends Thread {
 
@@ -63,37 +63,13 @@ public class ExportToCSV extends Thread {
               row[i] = table.fields.get(i).name;
             }
             csvFile.writeLine(row);
-            ResultSet rstOrigin = origin.base.getHelper().selectFields(table, originConn);
+            ResultSet rstOrigin = origin.base.getHelper().selectAll(table, originConn);
             long recordCount = 0;
             while (rstOrigin.next()) {
               recordCount++;
               progress.log("Writing record " + recordCount + " of " + tableHead.name);
               for (int i = 0; i < table.fields.size(); i++) {
-                switch (table.fields.get(i).nature) {
-                  case Bool:
-                  case Int:
-                  case Long:
-                  case Float:
-                  case Double:
-                  case Char:
-                  case Chars:
-                    row[i] = rstOrigin.getString(i + 1);
-                    break;
-                  case Date:
-                    row[i] = WzdDate.formatDate(rstOrigin.getDate(i + 1));
-                    break;
-                  case Time:
-                    row[i] = WzdDate.formatTime(rstOrigin.getTime(i + 1));
-                    break;
-                  case Timestamp:
-                    row[i] = WzdDate.formatTimestamp(rstOrigin.getTimestamp(i + 1));
-                    break;
-                  case Bytes:
-                    row[i] = WzdFile.encodeToBase64(rstOrigin.getBytes(i + 1));
-                    break;
-                  default:
-                    throw new Exception("DataType Not Supported.");
-                }
+                row[i] = table.fields.get(i).formatValue(rstOrigin.getObject(i + 1));
               }
               csvFile.writeLine(row);
             }

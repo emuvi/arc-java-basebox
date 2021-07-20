@@ -8,6 +8,8 @@ import java.util.List;
 import pin.jarbox.dat.Table;
 import pin.jarbox.dat.TableField;
 import pin.jarbox.dat.TableHead;
+import pin.jarbox.wzd.WzdArray;
+import pin.jarbox.wzd.WzdChars;
 
 
 public abstract class BaseHelper {
@@ -15,7 +17,7 @@ public abstract class BaseHelper {
   public abstract boolean isErrorPrimaryKey(Exception error);
 
   public abstract void createTable(Connection connection, Table table,
-      boolean onlyIfNotExists) throws Exception;
+      boolean ifNotExists) throws Exception;
 
   public List<TableHead> getTables(Connection connection) throws Exception {
     DatabaseMetaData meta = connection.getMetaData();
@@ -27,21 +29,54 @@ public abstract class BaseHelper {
     return result;
   }
 
-  public ResultSet selectFields(Table fromTable, Connection onConnection)
+  public ResultSet selectAll(Table fromTable, Connection onConnection)
       throws Exception {
-    StringBuilder select = new StringBuilder("SELECT ");
+    StringBuilder builder = new StringBuilder("SELECT ");
     boolean first = true;
     for (TableField field : fromTable.fields) {
       if (first) {
         first = false;
       } else {
-        select.append(", ");
+        builder.append(", ");
       }
-      select.append(field.name);
+      builder.append(field.name);
     }
-    select.append(" FROM ");
-    select.append(fromTable.getSchemaName());
-    return onConnection.createStatement().executeQuery(select.toString());
+    builder.append(" FROM ");
+    builder.append(fromTable.getSchemaName());
+    return onConnection.createStatement().executeQuery(builder.toString());
+  }
+
+  public void insert(Table inTable, Connection onConnection, Object... values) throws Exception {
+    StringBuilder builder = new StringBuilder("INSERT INTO ");
+    builder.append(inTable.getSchemaName());
+    builder.append(" (");
+    for (int i = 0; i < values.length; i++) {
+      if (i > 0) {
+        builder.append(", ");
+      }
+      builder.append(inTable.fields.get(i).name);
+    }
+    builder.append(") VALUES (");
+    for (int i = 0; i < values.length; i++) {
+      if (i > 0) {
+        builder.append(", ");
+      }
+      if (values[i] != null) {
+        builder.append("?");
+      } else {
+        builder.append("NULL");
+      }
+    }
+    builder.append(")");
+    var prepared = onConnection.prepareStatement(builder.toString());
+    var param_index = 1;
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] != null) {
+        prepared.setObject(param_index, values[i]);
+        param_index++;
+      }
+    }
+    prepared.executeUpdate();
   }
 
 }

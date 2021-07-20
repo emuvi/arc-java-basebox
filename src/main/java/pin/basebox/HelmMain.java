@@ -156,6 +156,17 @@ public class HelmMain extends Helm {
   }
 
   private void importFromCSV() {
-    System.out.println("Import");
+    try {
+      var destiny = connectorsList.getSelectedValue();
+      if (destiny == null) {
+        throw new Exception("You must select a connector.");
+      }
+      var origin = WzdFile.open();
+      if (origin != null) {
+        new ImportFromCSV(origin, destiny, new ProgressDesk("Import from CSV", true)).start();
+      }
+    } catch (Exception e) {
+      WzdLog.treat(e);
+    }
   }
 }
